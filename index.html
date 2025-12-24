@@ -37,9 +37,9 @@
 
         /* Utility for 3D Context */
         .scene {
-            perspective: 1500px;
             width: 100vw;
-            height: 100vh;
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Fix mobile vertical center */
             display: flex;
             justify-content: center;
             align-items: center;
