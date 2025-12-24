@@ -1073,8 +1073,17 @@
         const particles = [];
 
         function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+            // Mobile Optimization: Lower resolution on small screens
+            const isMobile = window.innerWidth < 768;
+            const dpr = isMobile ? 0.5 : 1; // Lower density for mobile
+            
+            width = canvas.width = window.innerWidth * dpr;
+            height = canvas.height = window.innerHeight * dpr;
+            
+            // Adjust scale logic if needed, but for snow just mapping coordinate space is enough
+            // We might need to scale context if we wanted exact 1:1 match, but for snow randomness it's fine.
+            // Actually, to keep particles looking same size relative to screen, we need to account for this.
+            // But simpler is just to let them be "coarser" on mobile.
         }
 
         class Particle {
@@ -1084,7 +1093,7 @@
             reset() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * -height;
-                this.speed = Math.random() * 1 + 1; /* Slightly faster snow */
+                this.speed = Math.random() * 1 + 1; 
                 this.size = Math.random() * 2 + 1;
                 this.drift = Math.random() * 1 - 0.5;
             }
@@ -1124,7 +1133,9 @@
         // --- Bokeh Effect ---
         function initBokeh() {
             const container = document.getElementById('bokeh-container');
-            const lightCount = 35; 
+            // Mobile Optimization: Fewer particles
+            const isMobile = window.innerWidth < 768;
+            const lightCount = isMobile ? 15 : 35; 
 
             for (let i = 0; i < lightCount; i++) {
                 const light = document.createElement('div');
