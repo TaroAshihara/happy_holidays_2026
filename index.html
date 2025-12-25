@@ -20,8 +20,24 @@
             --gold-dark: #8A6E30;
             --bg-color: #0B3B24; /* Deep Forest Green */
             --card-white: #FDFBF7;
-            --envelope-color: #F8F9FA; 
-            --envelope-inner: #E5E7EB;
+            --bg-color: #0B3B24; /* Deep Forest Green */
+            --card-white: #FDFBF7;
+            --envelope-cream: #E8E2D2; /* Smooth Beige for envelope */
+            --envelope-color: var(--envelope-cream); 
+            --envelope-inner: #D8D2C2; /* Slightly darker inside */
+            /* --envelope-inner should match cream roughly for flap inners? Or match card pocket? */
+            /* Using cream for flap inner to look like same paper */
+            --flap-inner-color: var(--envelope-cream); 
+            --border-blue-gray: #778899; /* LightSlateGray */
+            --border-blue-gray: #778899; /* LightSlateGray */
+            --border-width: 6px;
+            --border-inset: 12px;
+            --inner-margin: 15px;
+            --gold-paper-gap: 5px; /* Gap between white paper and gold border */
+            
+            /* Radius Logic */
+            --gold-radius: 25px; /* The radius of the gold border cut */
+            --white-cut-radius: calc(var(--gold-radius) - var(--gold-paper-gap));
             
             /* Paper Texture (SVG Noise) */
 --paper-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 700' width='700' height='700' opacity='0.3'%3E%3Cdefs%3E%3Cfilter id='nnnoise-filter' x='-20%25' y='-20%25' width='140%25' height='140%25' filterUnits='objectBoundingBox' primitiveUnits='userSpaceOnUse' color-interpolation-filters='linearRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.1' numOctaves='4' seed='15' stitchTiles='stitch' x='0%25' y='0%25' width='100%25' height='100%25' result='turbulence'/%3E%3CfeSpecularLighting surfaceScale='6' specularConstant='2.3' specularExponent='20' lighting-color='%238b572a' x='0%25' y='0%25' width='100%25' height='100%25' in='turbulence' result='specularLighting'%3E%3CfeDistantLight azimuth='3' elevation='181'/%3E%3C/feSpecularLighting%3E%3CfeColorMatrix type='saturate' values='0' x='0%25' y='0%25' width='100%25' height='100%25' in='specularLighting' result='colormatrix'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='%238b572a' filter='url(%23nnnoise-filter)'/%3E%3C/svg%3E");        
@@ -102,11 +118,31 @@
             bottom: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--envelope-color);
-            background-image: var(--paper-texture);
+            /* background-color: var(--envelope-color); replaced by SVG */
             z-index: 10;
-            clip-path: polygon(0 0, 50% 50%, 100% 0, 100% 100%, 0 100%);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            /* clip-path removed */
+            pointer-events: none; /* Let clicks pass through transparent areas */
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+        }
+
+        .envelope-body svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: auto; /* Catch clicks on the paper itself */
+        }
+        
+        .envelope-shape {
+            fill: var(--envelope-cream);
+            stroke: none;
+        }
+
+        .envelope-lines {
+            fill: none;
+            stroke: var(--border-blue-gray);
+            stroke-width: 12; /* Thick border */
+            stroke-linejoin: round;
+            stroke-linecap: round;
         }
 
         .envelope-back {
@@ -124,19 +160,101 @@
             top: 0;
             width: 100%;
             height: 55%; /* Flap height */
-            background-color: #ffffff;
-            background-image: var(--paper-texture);
-            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            /* background color/clip-path removed */
             transform-origin: top;
             transition: transform 0.8s ease-in-out, z-index 0s linear 0.4s;
             z-index: 20; /* Initially above card */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
+            pointer-events: none;
+            transform-style: preserve-3d; /* Enable double-sided support */
+        }
+        
+        /* Flap Faces Logic */
+        .flap-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .flap-outer {
+            z-index: 2;
+            transform: rotateX(0deg);
+        }
+
+        .flap-inner {
+            z-index: 1;
+            transform: rotateX(180deg);
+        }
+
+        /* SVG styles for flap */
+        .flap-content svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            pointer-events: auto;
+        }
+        
+        /* Special class for inner flap lines (no border) */
+        .envelope-lines.inner-face {
+            stroke: none; /* No border for inside */
         }
 
         .envelope-flap.open {
             transform: rotateX(180deg);
             z-index: 0; /* Move behind after opening */
             transition: transform 0.8s ease-in-out, z-index 0s linear 0.4s;
+        }
+        
+        /* Wax Seal */
+        .envelope-seal {
+            position: absolute;
+            bottom: -25px; /* Hang off the bottom tip of the flap */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #CFB53B, #8A6E30); /* Gold gradient */
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 25;
+            border: 2px solid #E6C888;
+            
+            /* Hide when open (if backface-visibility fails or for explicit control) */
+            transition: opacity 1s ease-in-out; 
+            opacity: 1;
+        }
+        
+        .envelope-seal.fade-out {
+             opacity: 0;
+        }
+        
+        .envelope-seal::after {
+            content: "";
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255,255,255,0.3);
+        }
+
+        /* Back Signatures */
+        .envelope-signatures {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.2rem;
+            color: #8A6E30; /* Dark Gold */
+            z-index: 15;
+            pointer-events: none;
+            opacity: 0.8;
         }
 
         /* --- Card Styles --- */
@@ -248,7 +366,9 @@
         /* Front Cover Design */
         .face-front {
             background: var(--card-white);
-            /* border: 1px solid #ddd;  <- Removed border to prevent seam line */
+            /* border moved to inner element */
+            /* border: 12px solid var(--border-blue-gray); */ 
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -259,10 +379,11 @@
 
         /* Inside Top Design (Back of the front cover) */
         .face-back {
-            background: var(--card-white);
+            background: var(--border-blue-gray); /* Layout background */
             transform: rotateX(180deg);
             display: flex;
             flex-direction: column;
+            position: relative; /* Ensure it is a positioning context */
             
             /* Align content to start (top) */
             justify-content: flex-start;
@@ -280,6 +401,29 @@
             padding-bottom: 0;
         }
 
+        /* White Paper Insert (Upper) */
+        .face-back::before {
+            content: "";
+            position: absolute;
+            top: var(--inner-margin);
+            left: var(--inner-margin);
+            right: var(--inner-margin);
+            bottom: 0;
+            
+            /* Inverted Corners Logic for White Paper */
+            /* Offset center by gap to match gold border center physically */
+            background: 
+                radial-gradient(circle var(--white-cut-radius) at var(--gold-paper-gap) var(--gold-paper-gap), transparent var(--white-cut-radius), var(--card-white) calc(var(--white-cut-radius) + 0.5px)) top left,
+                radial-gradient(circle var(--white-cut-radius) at calc(100% - var(--gold-paper-gap)) var(--gold-paper-gap), transparent var(--white-cut-radius), var(--card-white) calc(var(--white-cut-radius) + 0.5px)) top right;
+            background-size: 51% 100%; /* Split vertically */
+            background-repeat: no-repeat;
+            background-color: transparent; /* Ensure no underlying fill interferes */
+            
+            /* Old border-radius removed */
+            /* border-radius: var(--inner-radius) var(--inner-radius) 0 0; */
+            z-index: 0;
+        }
+
         /* Lower Half (Inside Bottom) - Actually the static base */
         .card-lower {
             position: absolute;
@@ -287,7 +431,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--card-white);
+            background: var(--border-blue-gray); /* Layout background */
             z-index: 1; /* Behind upper initially */
             display: flex; /* Initially hidden by upper */
             flex-direction: column;
@@ -307,6 +451,29 @@
             padding-top: 0;
         }
 
+        /* White Paper Insert (Lower) */
+        .card-lower::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: var(--inner-margin);
+            right: var(--inner-margin);
+            bottom: var(--inner-margin);
+            
+             /* Inverted Corners Logic for White Paper */
+            background: 
+                radial-gradient(circle var(--white-cut-radius) at var(--gold-paper-gap) calc(100% - var(--gold-paper-gap)), transparent var(--white-cut-radius), var(--card-white) calc(var(--white-cut-radius) + 0.5px)) bottom left,
+                radial-gradient(circle var(--white-cut-radius) at calc(100% - var(--gold-paper-gap)) calc(100% - var(--gold-paper-gap)), transparent var(--white-cut-radius), var(--card-white) calc(var(--white-cut-radius) + 0.5px)) bottom right;
+            background-size: 51% 100%;
+            background-repeat: no-repeat;
+            background-color: transparent;
+            
+            /* Old border-radius removed */
+            /* border-radius: 0 0 var(--inner-radius) var(--inner-radius); */
+            z-index: 0;
+        }
+
+
         /* Content Wrappers for centering text in available space */
         .text-area-top {
             flex-grow: 1;
@@ -314,7 +481,10 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            width: 100%;
             padding-bottom: 5px;
+            position: relative;
+            z-index: 1; /* Ensure above white paper */
         }
 
         .text-area-bottom {
@@ -323,21 +493,44 @@
             align-items: center;
             justify-content: center;
             width: 100%;
+            width: 100%;
             padding-top: 5px;
+            position: relative;
+            z-index: 1; /* Ensure above white paper */
         }
+
+        /* --- Blue Gray Inner Border --- */
+        .front-border-inner {
+            position: absolute;
+            top: var(--border-inset);
+            left: var(--border-inset);
+            right: var(--border-inset);
+            bottom: var(--border-inset);
+            border: var(--border-width) solid var(--border-blue-gray);
+            pointer-events: none;
+            z-index: 5; /* Below text but above background */
+        }
+
 
         /* --- Design Details --- */
         /* Gold Frame (Inverted Corners) */
         .gold-border-double {
             position: absolute;
-            top: 15px; left: 15px; right: 15px; bottom: 15px;
             pointer-events: none;
             z-index: 10;
             
             /* Settings */
             --b: 2px; 
-            --r: 25px; 
+            --r: var(--gold-radius); 
             --color: var(--gold);
+            
+            /* Positioning Logic */
+            --gold-inset: calc(var(--inner-margin) + var(--gold-paper-gap));
+            
+            top: var(--gold-inset); 
+            left: var(--gold-inset); 
+            right: var(--gold-inset); 
+            bottom: var(--gold-inset);
             
             border: none;
             box-shadow: none;
@@ -801,6 +994,7 @@
                     <div class="card-upper" id="card-upper">
                         <!-- Front Face (Cover) -->
                         <div class="face face-front">
+                            <div class="front-border-inner"></div>
                             
                             <!-- Stamp (Keeping it as it doesn't conflict with center, but user might want it gone? I'll leave it for now but maybe later remove if requested) -->
                             <div class="stamp-placeholder">
@@ -846,8 +1040,43 @@
                 </div>
             </div>
 
-            <div class="envelope-body"></div>
-            <div class="envelope-flap" id="flap"></div>
+            <div class="envelope-body">
+                <svg viewBox="0 0 500 330" preserveAspectRatio="none">
+                    <!-- Shape Fill (No Border) -->
+                    <path class="envelope-shape" d="M 0 0 L 250 165 L 500 0 L 500 330 L 0 330 Z"></path>
+                    
+                    <!-- Top V Border REMOVED as per user request (only flap has border) -->
+                    <!-- <path class="envelope-lines" d="M 0 0 L 250 165 L 500 0" vector-effect="non-scaling-stroke"></path> -->
+                    
+                    <!-- Diagonal Seam Lines REMOVED as per user request -->
+                    <!-- <path class="envelope-lines" d="M 0 330 L 250 165 M 500 330 L 250 165" vector-effect="non-scaling-stroke"></path> -->
+                    
+                    <image href="" width="100%" height="100%" preserveAspectRatio="none" style="filter: url(#nnnoise-filter); mix-blend-mode: multiply; opacity: 0.3; pointer-events: none;" /> 
+                </svg>
+                
+                <div class="envelope-signatures">
+                    Taro Ashihara &nbsp; Yuki Ashihara
+                </div>
+            </div>
+            
+            <div class="envelope-flap" id="flap">
+                <div class="flap-content flap-outer">
+                    <svg viewBox="0 0 500 181" preserveAspectRatio="none">
+                        <!-- Shape Fill -->
+                        <path class="envelope-shape" d="M 0 0 L 250 181 L 500 0 Z"></path>
+                        
+                         <!-- Triangle V Border (No top border) -->
+                        <path class="envelope-lines" d="M 0 0 L 250 181 L 500 0" vector-effect="non-scaling-stroke"></path>
+                    </svg>
+                    <div class="envelope-seal"></div>
+                </div>
+                <div class="flap-content flap-inner">
+                    <svg viewBox="0 0 500 181" preserveAspectRatio="none">
+                        <!-- Shape Fill Only -->
+                        <path class="envelope-shape" d="M 0 0 L 250 181 L 500 0 Z"></path>
+                    </svg>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -886,6 +1115,7 @@
         const flap = document.getElementById('flap');
         const cardContainer = document.getElementById('card-container');
         const cardUpper = document.getElementById('card-upper');
+        const seal = document.querySelector('.envelope-seal');
 
         const bgm = document.getElementById('bgm'); // Assuming an audio element with id="bgm" will be added
         const loginBtn = document.getElementById('login-btn');
@@ -1021,29 +1251,33 @@
                 envelope.classList.add('animate-in');
             }, 2000);
 
-            // 3. Open Flap
-            // Envelope fly-in takes 2.5s. 2000 + 2500 = 4500. Buffer -> 5000
+            // 3. Fade Out Seal (Wait for envelope to arrive 2000+2500=4500)
+            setTimeout(() => {
+                if(seal) seal.classList.add('fade-out');
+            }, 4500);
+
+            // 4. Open Flap (After seal fades)
+            // Wait 1s for fade (4500+1000=5500)
             setTimeout(() => {
                 flap.classList.add('open');
-                // playChime(); // Gentle sound on open - removed as per instruction, replaced by BGM
-            }, 5000);
+            }, 5500);
 
-            // 4. Pull out Card
+            // 5. Pull out Card
+            // Shifted by +500ms from previous 6000
             setTimeout(() => {
                 cardContainer.classList.add('pulled-out');
-            }, 6000);
+            }, 6500);
 
-            // Wait for pull out to finish (6000 start + 2500 duration = 8500ms total)
-            // Then swap class to enable smooth transitions
+            // Wait for pull out to finish (6500 start + 2500 duration = 9000ms total)
             setTimeout(() => {
                 cardContainer.classList.remove('pulled-out');
                 cardContainer.classList.add('interactive');
-            }, 8500);
+            }, 9000);
 
-            // 5. Open Card (First Time)
+            // 6. Open Card (First Time)
             setTimeout(() => {
                 toggleCard();
-            }, 9000);  
+            }, 9500);  
         }
 
         // --- Card Interaction ---
