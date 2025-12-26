@@ -546,14 +546,15 @@
 
 
         /* --- Design Details --- */
-        /* Gold Frame (Inverted Corners) */
+        /* Updated: Double Gold Frame (Inverted Corners) with ::after for second line */
         .gold-border-double {
             position: absolute;
             pointer-events: none;
             z-index: 10;
             
             /* Settings */
-            --b: 2px; 
+            --b: 1px; /* Thinner for double line */
+            --gap: 3px; /* Gap between lines */
             --r: var(--gold-radius); 
             --color: var(--gold);
             
@@ -569,21 +570,24 @@
             box-shadow: none;
         }
 
-        .gold-border-double {
-            background:
-                linear-gradient(to right, var(--color), var(--color)) top center / calc(100% - 2*var(--r)) var(--b) no-repeat,
-                linear-gradient(to right, var(--color), var(--color)) bottom center / calc(100% - 2*var(--r)) var(--b) no-repeat,
-                linear-gradient(to bottom, var(--color), var(--color)) center left / var(--b) calc(100% - 2*var(--r)) no-repeat,
-                linear-gradient(to bottom, var(--color), var(--color)) center right / var(--b) calc(100% - 2*var(--r)) no-repeat,
-                radial-gradient(circle var(--r) at 0 0, transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) top left / var(--r) var(--r) no-repeat,
-                radial-gradient(circle var(--r) at 100% 0, transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) top right / var(--r) var(--r) no-repeat,
-                radial-gradient(circle var(--r) at 0 100%, transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) bottom left / var(--r) var(--r) no-repeat,
-                radial-gradient(circle var(--r) at 100% 100%, transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) bottom right / var(--r) var(--r) no-repeat;
+        /* Inner Line Logic using ::after */
+        .gold-border-double::after {
+            content: "";
+            position: absolute;
+            inset: var(--gap);
+            border: none;
+            z-index: 10;
+            pointer-events: none;
+            
+            /* Inner Radius Math: r + gap ensures concentric inverted corners */
+            --r-inner: calc(var(--r) + var(--gap));
         }
-        
-        .gold-border-double::after { content: none; }
 
-        /* Inner Spread Frame Adjustments */
+        /* ------------------------------------------- */
+        /* Lower Half Borders (U-Shape)                */
+        /* ------------------------------------------- */
+        
+        /* Outer Line */
         .card-lower .gold-border-double {
             top: 0; 
             background:
@@ -594,6 +598,22 @@
                 radial-gradient(circle var(--r) at 100% 100%, transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) bottom right / var(--r) var(--r) no-repeat;
         }
 
+        /* Inner Line */
+        .card-lower .gold-border-double::after {
+            background:
+                linear-gradient(to right, var(--color), var(--color)) bottom center / calc(100% - 2*var(--r)) var(--b) no-repeat,
+                linear-gradient(to bottom, var(--color), var(--color)) left top / var(--b) calc(100% - var(--r)) no-repeat,
+                linear-gradient(to bottom, var(--color), var(--color)) right top / var(--b) calc(100% - var(--r)) no-repeat,
+                /* Adjusted Radial Gradients for Inner Concentricity */
+                radial-gradient(circle var(--r-inner) at calc(0px - var(--gap)) calc(100% + var(--gap)), transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) bottom left / var(--r-inner) var(--r-inner) no-repeat,
+                radial-gradient(circle var(--r-inner) at calc(100% + var(--gap)) calc(100% + var(--gap)), transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) bottom right / var(--r-inner) var(--r-inner) no-repeat;
+        }
+
+        /* ------------------------------------------- */
+        /* Upper Half Borders (Inverted U-Shape)       */
+        /* ------------------------------------------- */
+
+        /* Outer Line */
         .face-back .gold-border-double {
             bottom: 0; 
             background:
@@ -602,6 +622,17 @@
                 linear-gradient(to bottom, var(--color), var(--color)) right bottom / var(--b) calc(100% - var(--r)) no-repeat,
                 radial-gradient(circle var(--r) at 0 0, transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) top left / var(--r) var(--r) no-repeat,
                 radial-gradient(circle var(--r) at 100% 0, transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) top right / var(--r) var(--r) no-repeat;
+        }
+
+        /* Inner Line */
+        .face-back .gold-border-double::after {
+            background:
+                linear-gradient(to right, var(--color), var(--color)) top center / calc(100% - 2*var(--r)) var(--b) no-repeat,
+                linear-gradient(to bottom, var(--color), var(--color)) left bottom / var(--b) calc(100% - var(--r)) no-repeat,
+                linear-gradient(to bottom, var(--color), var(--color)) right bottom / var(--b) calc(100% - var(--r)) no-repeat,
+                /* Adjusted Radial Gradients for Inner Concentricity */
+                radial-gradient(circle var(--r-inner) at calc(0px - var(--gap)) calc(0px - var(--gap)), transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) top left / var(--r-inner) var(--r-inner) no-repeat,
+                radial-gradient(circle var(--r-inner) at calc(100% + var(--gap)) calc(0px - var(--gap)), transparent calc(100% - var(--b) - 0.5px), var(--color) calc(100% - var(--b)), var(--color) 100%, transparent 100%) top right / var(--r-inner) var(--r-inner) no-repeat;
         }
 
         .stamp-placeholder {
