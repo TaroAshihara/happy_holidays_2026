@@ -293,7 +293,7 @@
             height: min(56vw, 310px); /* Slightly smaller than envelope */
             left: 50%;
             bottom: 5px;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateZ(-1px);
             transform-style: preserve-3d;
             /* Update: Slower transition for elegant movement (2.5s) */
             transition: transform 2.5s ease-in-out, bottom 1s ease-in-out;
@@ -319,11 +319,11 @@
 
         @keyframes pullOutCard {
             0% { 
-                transform: translateX(-50%) translateY(0);
+                transform: translateX(-50%) translateY(0) translateZ(-1px);
                 z-index: 5;
             }
             40% { 
-                transform: translateX(-50%) translateY(-120%); 
+                transform: translateX(-50%) translateY(-120%) translateZ(-1px); 
                 z-index: 5; /* Keep behind envelope body while rising */
             }
             41% {
@@ -428,6 +428,7 @@
             
             /* Reset padding to allow margin auto to work for centering */
             padding-bottom: 0;
+            overflow: hidden; /* Clip shadow at the fold/hinge */
         }
 
         /* White Paper Insert (Upper) */
@@ -451,6 +452,7 @@
             /* Old border-radius removed */
             /* border-radius: var(--inner-radius) var(--inner-radius) 0 0; */
             z-index: 0;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25)); /* Shadow for layered paper effect */
         }
 
         /* Lower Half (Inside Bottom) - Actually the static base */
@@ -478,6 +480,7 @@
             
             /* Reset padding to allow margin auto to work for centering */
             padding-top: 0;
+            overflow: hidden; /* Clip shadow at the fold/hinge */
         }
 
         /* White Paper Insert (Lower) */
@@ -500,6 +503,7 @@
             /* Old border-radius removed */
             /* border-radius: 0 0 var(--inner-radius) var(--inner-radius); */
             z-index: 0;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25)); /* Shadow for layered paper effect */
         }
 
 
@@ -994,22 +998,6 @@
 
     <!-- Main 3D Scene -->
     <div class="scene">
-        <!-- Global SVG Definitions (Hidden) -->
-        <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
-          <defs>
-            <filter id="paper-noise-filter">
-              <feTurbulence type="fractalNoise" baseFrequency="0.1" numOctaves="4" seed="15" stitchTiles="stitch" result="turbulence"/>
-              <feSpecularLighting surfaceScale="6" specularConstant="2.3" specularExponent="20" lighting-color="#8b572a" in="turbulence" result="specularLighting">
-                <feDistantLight azimuth="3" elevation="181"/>
-              </feSpecularLighting>
-              <feColorMatrix type="saturate" values="0" in="specularLighting" result="colormatrix"/>
-            </filter>
-            <pattern id="paper-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
-              <rect width="200" height="200" fill="#8b572a" filter="url(#paper-noise-filter)" opacity="0.3"/>
-            </pattern>
-          </defs>
-        </svg>
-
         <div class="envelope-wrapper" id="envelope">
             <div class="envelope-back"></div>
             
@@ -1087,20 +1075,16 @@
 
             <div class="envelope-body">
                 <svg viewBox="0 0 500 330" preserveAspectRatio="none">
-                    <!-- Shape Fill (Base Color) -->
+                    <!-- Shape Fill (No Border) -->
                     <path class="envelope-shape" d="M 0 0 L 250 165 L 500 0 L 500 330 L 0 330 Z"></path>
                     
-                    <!-- Texture Overlay (Multiply) -->
-                    <path d="M 0 0 L 250 165 L 500 0 L 500 330 L 0 330 Z" fill="url(#paper-pattern)" style="mix-blend-mode: multiply;"></path>
-                    
-                    <!-- Top V Border (Restored as per user request) -->
-                    <path class="envelope-lines" d="M 0 0 L 250 165 L 500 0" vector-effect="non-scaling-stroke"></path>
+                    <!-- Top V Border REMOVED as per user request (only flap has border) -->
+                    <!-- <path class="envelope-lines" d="M 0 0 L 250 165 L 500 0" vector-effect="non-scaling-stroke"></path> -->
                     
                     <!-- Diagonal Seam Lines REMOVED as per user request -->
                     <!-- <path class="envelope-lines" d="M 0 330 L 250 165 M 500 330 L 250 165" vector-effect="non-scaling-stroke"></path> -->
                     
-                    <!-- Old image overlay removed -->
-                    <!-- <image href="" width="100%" height="100%" preserveAspectRatio="none" style="filter: url(#nnnoise-filter); mix-blend-mode: multiply; opacity: 0.3; pointer-events: none;" /> -->
+                    <image href="" width="100%" height="100%" preserveAspectRatio="none" style="filter: url(#nnnoise-filter); mix-blend-mode: multiply; opacity: 0.3; pointer-events: none;" /> 
                 </svg>
                 
                 <div class="envelope-signatures">
@@ -1113,9 +1097,6 @@
                     <svg viewBox="0 0 500 181" preserveAspectRatio="none">
                         <!-- Shape Fill -->
                         <path class="envelope-shape" d="M 0 0 L 250 181 L 500 0 Z"></path>
-                        
-                        <!-- Texture Overlay (Multiply) -->
-                        <path d="M 0 0 L 250 181 L 500 0 Z" fill="url(#paper-pattern)" style="mix-blend-mode: multiply;"></path>
                         
                          <!-- Triangle V Border (No top border) -->
                         <path class="envelope-lines" d="M 0 0 L 250 181 L 500 0" vector-effect="non-scaling-stroke"></path>
@@ -1137,9 +1118,6 @@
                     <svg viewBox="0 0 500 181" preserveAspectRatio="none">
                         <!-- Shape Fill Only -->
                         <path class="envelope-shape" d="M 0 0 L 250 181 L 500 0 Z"></path>
-                        
-                        <!-- Texture Overlay (Multiply) -->
-                        <path d="M 0 0 L 250 181 L 500 0 Z" fill="url(#paper-pattern)" style="mix-blend-mode: multiply;"></path>
                     </svg>
                 </div>
             </div>
