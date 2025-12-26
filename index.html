@@ -166,6 +166,7 @@
             pointer-events: none;
             transform: translateZ(1px); /* Ensure it sits in front of body */
             transform-style: preserve-3d; /* Enable double-sided support */
+            will-change: transform;
         }
         
         /* Flap Faces Logic */
@@ -295,6 +296,7 @@
             bottom: 5px;
             transform: translateX(-50%) translateZ(-1px);
             transform-style: preserve-3d;
+            will-change: transform;
             /* Update: Slower transition for elegant movement (2.5s) */
             transition: transform 2.5s ease-in-out, bottom 1s ease-in-out;
             z-index: 5; /* Inside envelope initially */
@@ -1117,7 +1119,7 @@
                     <!-- Diagonal Seam Lines REMOVED as per user request -->
                     <!-- <path class="envelope-lines" d="M 0 330 L 250 165 M 500 330 L 250 165" vector-effect="non-scaling-stroke"></path> -->
                     
-                    <image href="" width="100%" height="100%" preserveAspectRatio="none" style="filter: url(#nnnoise-filter); mix-blend-mode: multiply; opacity: 0.3; pointer-events: none;" /> 
+                    <image href="" width="100%" height="100%" preserveAspectRatio="none" style="mix-blend-mode: multiply; opacity: 0.3; pointer-events: none;" /> 
                 </svg>
                 
                 <div class="envelope-signatures">
