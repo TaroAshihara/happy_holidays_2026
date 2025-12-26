@@ -120,6 +120,7 @@
             /* clip-path removed */
             pointer-events: none; /* Let clicks pass through transparent areas */
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+            transform: translateZ(0);
         }
 
         .envelope-body svg {
@@ -150,7 +151,7 @@
             background-color: var(--envelope-inner);
             background-image: var(--paper-texture);
             z-index: 1;
-            transform: translateZ(-2px);
+            transform: translateZ(-10px);
         }
 
         .envelope-flap {
@@ -204,7 +205,7 @@
         }
 
         .envelope-flap.open {
-            transform: translateZ(-2px) rotateX(180deg);
+            transform: translateZ(-10px) rotateX(180deg);
             z-index: 0; /* Move behind after opening */
             transition: transform 0.8s ease-in-out, z-index 0s linear 0.4s;
         }
@@ -294,7 +295,8 @@
             height: min(56vw, 310px); /* Slightly smaller than envelope */
             left: 50%;
             bottom: 5px;
-            transform: translateX(-50%) translateZ(-1px);
+            bottom: 5px;
+            transform: translateX(-50%) translateZ(-5px);
             transform-style: preserve-3d;
             will-change: transform;
             /* Update: Slower transition for elegant movement (2.5s) */
@@ -314,29 +316,29 @@
         .card-container.interactive {
             animation: none; /* Stop animation to allow transition */
             /* Match the 100% state of pullOutCard */
-            transform: translateX(-50%) translateY(50%) translateZ(200px);
+            transform: translateX(-50%) translateY(50%) translateZ(50px);
             bottom: 50%;
             z-index: 50;
         }
 
         @keyframes pullOutCard {
             0% { 
-                transform: translateX(-50%) translateY(0) translateZ(-1px);
+                transform: translateX(-50%) translateY(0) translateZ(-5px);
                 z-index: 5;
             }
             40% { 
-                transform: translateX(-50%) translateY(-120%) translateZ(-1px); 
+                transform: translateX(-50%) translateY(-120%) translateZ(-5px); 
                 z-index: 5; /* Keep behind envelope body while rising */
             }
             41% {
                 z-index: 50; /* Switch to front after clearing the pocket */
             }
             60% { 
-                transform: translateX(-50%) translateY(-120%) translateZ(100px); 
+                transform: translateX(-50%) translateY(-120%) translateZ(25px); 
                 z-index: 50;
             }
             100% { 
-                transform: translateX(-50%) translateY(50%) translateZ(200px); 
+                transform: translateX(-50%) translateY(50%) translateZ(50px); 
                 bottom: 50%; 
                 z-index: 50; /* Keep in front */
             }
@@ -372,7 +374,7 @@
         /* When card opens, shift the whole container down smoothly */
         .card-container.card-open {
             /* Move down further to center the opened card */
-            transform: translateX(-50%) translateY(100%) translateZ(200px) !important;
+            transform: translateX(-50%) translateY(100%) translateZ(50px) !important;
         }
         
         /* Force remove shadow when open to flatten the look */
@@ -405,13 +407,13 @@
             justify-content: center;
             align-items: center;
             z-index: 2;
-            transform: rotateX(0deg);
+            transform: rotateX(0deg) translateZ(1px);
         }
 
         /* Inside Top Design (Back of the front cover) */
         .face-back {
             background: var(--border-blue-gray); /* Layout background */
-            transform: rotateX(180deg);
+            transform: rotateX(180deg) translateZ(1px);
             display: flex;
             flex-direction: column;
             position: relative; /* Ensure it is a positioning context */
@@ -1053,7 +1055,8 @@
                             <p class="message-text">
                                 1961年芦原義信と初子は叔父の藤田嗣治のパリのアトリエ訪問をしました。
                                 太郎は叔父へ東京タワーの絵を描いてプレゼントし、叔父からこの絵をプレゼントしていただきました。<br>
-                                2026年が穏やかで輝きに満ちた1年になりますよう、心よりお祈りいたします。
+                                2026年が穏やかで輝きに満ちた1年になりますよう<br>
+                                心よりお祈りいたします。
                             </p>
                         </div>
                     </div>
@@ -1349,8 +1352,17 @@
 
             // Wait for pull out to finish (6500 start + 2500 duration = 9000ms total)
             setTimeout(() => {
+                // Temporarily disable transition to prevent Safari from interpolating from base state
+                cardContainer.style.transition = 'none';
+                
                 cardContainer.classList.remove('pulled-out');
                 cardContainer.classList.add('interactive');
+                
+                // Force reflow
+                void cardContainer.offsetWidth;
+                
+                // Restore transition
+                cardContainer.style.transition = '';
             }, 9000);
 
             // 6. Open Card (First Time)
