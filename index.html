@@ -9,7 +9,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Great+Vibes&family=Italianno&family=Noto+Serif+JP:wght@300;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond&family=Cinzel:wght@400;600&family=Great+Vibes&family=Italianno&family=Noto+Serif+JP:wght@300;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
     <style>
         /* Base Settings */
@@ -28,8 +28,7 @@
             /* --envelope-inner should match cream roughly for flap inners? Or match card pocket? */
             /* Using cream for flap inner to look like same paper */
             --flap-inner-color: var(--envelope-cream); 
-            --border-blue-gray: #778899; /* LightSlateGray */
-            --border-blue-gray: #778899; /* LightSlateGray */
+            --border-blue-gray: #1C2841; /* Dark Navy */
             --border-width: 6px;
             --border-inset: 12px;
             --inner-margin: 15px;
@@ -209,38 +208,68 @@
             transition: transform 0.8s ease-in-out, z-index 0s linear 0.4s;
         }
         
-        /* Wax Seal */
+            /* Container for Seal */
         .envelope-seal {
             position: absolute;
             bottom: -25px; /* Hang off the bottom tip of the flap */
             left: 50%;
             transform: translateX(-50%);
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #CFB53B, #8A6E30); /* Gold gradient */
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            width: 80px; /* Slightly larger for organic feel */
+            height: 80px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 25;
-            border: 2px solid #E6C888;
             
             /* Hide when open (if backface-visibility fails or for explicit control) */
             transition: opacity 1s ease-in-out; 
             opacity: 1;
+            
+            /* Apply drop shadow to whatever content is inside (CSS shape or PNG) */
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
         
         .envelope-seal.fade-out {
              opacity: 0;
         }
         
-        .envelope-seal::after {
+        /* CSS Fallback Seal */
+        .seal-css {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #CFB53B, #8A6E30); /* Gold gradient */
+            /* Organic Shape */
+            border-radius: 50% 55% 52% 48% / 50% 50% 55% 45%;
+            /* Removed outer shadow, kept inset */
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.4);
+            border: 2px solid #E6C888;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* If image is present (uncommented), hide the CSS fallback */
+        .seal-image + .seal-css {
+            display: none;
+        }
+        
+        .seal-css::after {
             content: "";
-            width: 55px;
-            height: 55px;
+            width: 70%;
+            height: 70%;
             border-radius: 50%;
             border: 1px dashed rgba(255,255,255,0.3);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Image Placeholder */
+        .seal-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            z-index: 2;
+            /* If src is set, it covers the CSS seal. If missing/hidden, CSS seal shows. */
         }
 
         /* Back Signatures */
@@ -608,11 +637,11 @@
         }
 
         .front-signatures {
-            font-family: 'Cinzel', serif;
-            font-size: clamp(0.7rem, 1.8vw, 1.1rem); /* Slightly smaller for balance */
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(0.3rem, 1.3vw, 0.8rem); /* Slightly smaller for balance */
             color: var(--gold-dark);
             letter-spacing: 0.1em;
-            text-transform: uppercase;
+            text-transform: none;
             line-height: 1.1; /* Tighter line height */
         }
 
@@ -965,6 +994,22 @@
 
     <!-- Main 3D Scene -->
     <div class="scene">
+        <!-- Global SVG Definitions (Hidden) -->
+        <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
+          <defs>
+            <filter id="paper-noise-filter">
+              <feTurbulence type="fractalNoise" baseFrequency="0.1" numOctaves="4" seed="15" stitchTiles="stitch" result="turbulence"/>
+              <feSpecularLighting surfaceScale="6" specularConstant="2.3" specularExponent="20" lighting-color="#8b572a" in="turbulence" result="specularLighting">
+                <feDistantLight azimuth="3" elevation="181"/>
+              </feSpecularLighting>
+              <feColorMatrix type="saturate" values="0" in="specularLighting" result="colormatrix"/>
+            </filter>
+            <pattern id="paper-pattern" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+              <rect width="200" height="200" fill="#8b572a" filter="url(#paper-noise-filter)" opacity="0.3"/>
+            </pattern>
+          </defs>
+        </svg>
+
         <div class="envelope-wrapper" id="envelope">
             <div class="envelope-back"></div>
             
@@ -1042,16 +1087,20 @@
 
             <div class="envelope-body">
                 <svg viewBox="0 0 500 330" preserveAspectRatio="none">
-                    <!-- Shape Fill (No Border) -->
+                    <!-- Shape Fill (Base Color) -->
                     <path class="envelope-shape" d="M 0 0 L 250 165 L 500 0 L 500 330 L 0 330 Z"></path>
                     
-                    <!-- Top V Border REMOVED as per user request (only flap has border) -->
-                    <!-- <path class="envelope-lines" d="M 0 0 L 250 165 L 500 0" vector-effect="non-scaling-stroke"></path> -->
+                    <!-- Texture Overlay (Multiply) -->
+                    <path d="M 0 0 L 250 165 L 500 0 L 500 330 L 0 330 Z" fill="url(#paper-pattern)" style="mix-blend-mode: multiply;"></path>
+                    
+                    <!-- Top V Border (Restored as per user request) -->
+                    <path class="envelope-lines" d="M 0 0 L 250 165 L 500 0" vector-effect="non-scaling-stroke"></path>
                     
                     <!-- Diagonal Seam Lines REMOVED as per user request -->
                     <!-- <path class="envelope-lines" d="M 0 330 L 250 165 M 500 330 L 250 165" vector-effect="non-scaling-stroke"></path> -->
                     
-                    <image href="" width="100%" height="100%" preserveAspectRatio="none" style="filter: url(#nnnoise-filter); mix-blend-mode: multiply; opacity: 0.3; pointer-events: none;" /> 
+                    <!-- Old image overlay removed -->
+                    <!-- <image href="" width="100%" height="100%" preserveAspectRatio="none" style="filter: url(#nnnoise-filter); mix-blend-mode: multiply; opacity: 0.3; pointer-events: none;" /> -->
                 </svg>
                 
                 <div class="envelope-signatures">
@@ -1065,15 +1114,32 @@
                         <!-- Shape Fill -->
                         <path class="envelope-shape" d="M 0 0 L 250 181 L 500 0 Z"></path>
                         
+                        <!-- Texture Overlay (Multiply) -->
+                        <path d="M 0 0 L 250 181 L 500 0 Z" fill="url(#paper-pattern)" style="mix-blend-mode: multiply;"></path>
+                        
                          <!-- Triangle V Border (No top border) -->
                         <path class="envelope-lines" d="M 0 0 L 250 181 L 500 0" vector-effect="non-scaling-stroke"></path>
                     </svg>
-                    <div class="envelope-seal"></div>
+                    <div class="envelope-seal">
+                        <!-- 
+                             To use a custom image:
+                             1. Prepare a PNG image with transparency.
+                             2. Uncomment the img tag below.
+                             3. Set the 'src' attribute to your image path.
+                             4. The CSS seal will automatically be covered.
+                        -->
+                        <img src="stamp.png" alt="Wax Seal" class="seal-image">
+                        
+                        <div class="seal-css"></div>
+                    </div>
                 </div>
                 <div class="flap-content flap-inner">
                     <svg viewBox="0 0 500 181" preserveAspectRatio="none">
                         <!-- Shape Fill Only -->
                         <path class="envelope-shape" d="M 0 0 L 250 181 L 500 0 Z"></path>
+                        
+                        <!-- Texture Overlay (Multiply) -->
+                        <path d="M 0 0 L 250 181 L 500 0 Z" fill="url(#paper-pattern)" style="mix-blend-mode: multiply;"></path>
                     </svg>
                 </div>
             </div>
