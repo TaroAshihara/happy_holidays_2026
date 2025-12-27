@@ -26,7 +26,7 @@
             /* --envelope-inner should match cream roughly for flap inners? Or match card pocket? */
             /* Using cream for flap inner to look like same paper */
             --flap-inner-color: var(--envelope-cream); 
-            --border-blue-gray: #1C2841; /* Dark Navy */
+            --border-blue-gray: #b2ab90; /* Taupe/Beige */
             --border-width: 6px;
             --border-inset: 12px;
             --inner-margin: 15px;
@@ -603,6 +603,7 @@
 
         /* Inner Line */
         .card-lower .gold-border-double::after {
+            top: 0; /* Override inset to close gap at hinge */
             background:
                 linear-gradient(to right, var(--color), var(--color)) bottom center / calc(100% - 2*var(--r)) var(--b) no-repeat,
                 linear-gradient(to bottom, var(--color), var(--color)) left top / var(--b) calc(100% - var(--r)) no-repeat,
@@ -629,6 +630,7 @@
 
         /* Inner Line */
         .face-back .gold-border-double::after {
+            bottom: 0; /* Override inset to close gap at hinge */
             background:
                 linear-gradient(to right, var(--color), var(--color)) top center / calc(100% - 2*var(--r)) var(--b) no-repeat,
                 linear-gradient(to bottom, var(--color), var(--color)) left bottom / var(--b) calc(100% - var(--r)) no-repeat,
@@ -850,7 +852,7 @@
         /* Message Text Specific Styling */
         .message-text {
             font-family: 'Noto Serif JP', serif;
-            font-size: clamp(0.5rem, 1.5vw, 0.8rem);
+            font-size: clamp(0.4rem, 1.2vw, 0.6rem);
             color: #555;
             text-align: center;
             width: 80%; 
@@ -1053,10 +1055,13 @@
                         <!-- Text Wrapper for centering -->
                         <div class="text-area-bottom">
                             <p class="message-text">
-                                1961年芦原義信と初子は叔父の藤田嗣治のパリのアトリエ訪問をしました。
-                                太郎は叔父へ東京タワーの絵を描いてプレゼントし、叔父からこの絵をプレゼントしていただきました。<br>
-                                2026年が穏やかで輝きに満ちた1年になりますよう<br>
-                                心よりお祈りいたします。
+                                1961年、芦原義信と初子は叔父の藤田嗣治の
+                                パリのアトリエを訪れました。その際、太郎は
+                                叔父へ東京タワーの絵を描いて贈り、作品を交換するかたちで、本作をプレゼントされました。
+                                <span style="display: block; margin-top: 15px;">
+                                    2026年が穏やかで輝きに満ちた1年になりますよう<br>
+                                    心よりお祈りいたします。
+                                </span>
                             </p>
                         </div>
                     </div>
@@ -1147,7 +1152,7 @@
                              3. Set the 'src' attribute to your image path.
                              4. The CSS seal will automatically be covered.
                         -->
-                        <img src="stamp.png" alt="Wax Seal" class="seal-image">
+                        <img src="stamp2.png" alt="Wax Seal" class="seal-image">
                         
                         <div class="seal-css"></div>
                     </div>
