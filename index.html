@@ -852,11 +852,15 @@
         /* Message Text Specific Styling */
         .message-text {
             font-family: 'Noto Serif JP', serif;
-            font-size: clamp(0.5rem, 1.2vw, 0.6rem);
+            font-size: clamp(0.38rem, 1.2vw, 0.6rem);
             color: #555;
             text-align: center;
-            width: 80%; 
+            width: 85%; 
             line-height: 1.6;
+            font-feature-settings: "palt";
+            letter-spacing: -0.05em;
+            word-break: keep-all;
+            overflow-wrap: normal;
             margin: 0; /* Handled by flex container */
         }
 
@@ -905,7 +909,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(11, 59, 36, 0.85); 
+            background: #882426; 
             backdrop-filter: blur(5px);
             transition: opacity 1s;
         }
@@ -1055,13 +1059,13 @@
                         <!-- Text Wrapper for centering -->
                         <div class="text-area-bottom">
                             <p class="message-text">
-                                1961年、芦原義信と初子は叔父の藤田嗣治の
-                                パリのアトリエを訪れました。その際、太郎は
-                                叔父へ東京タワーの絵を描いて贈り、作品を交換するかたちで、本作をプレゼントされました。
-                                <span style="display: block; margin-top: 15px;">
-                                    2026年が穏やかで輝きに満ちた1年になりますよう<br>
-                                    心よりお祈りいたします。
-                                </span>
+                               1961年、芦原義信と初子は叔父の藤田嗣治のパリのアトリエを訪れました。<br>
+    その際、太郎は叔父へ東京タワーの絵を描いて贈り、作品を交換するかたちで、<br>
+    本作をプレゼントされました。
+    <span style="display: block; margin-top: 15px;">
+        2026年が穏やかで輝きに満ちた1年になりますよう<br>
+        心よりお祈りいたします。
+    </span>
                             </p>
                         </div>
                     </div>
@@ -1395,6 +1399,7 @@
                 toggleCard();
             }
         });
+
 
         // --- Snow Effect ---
         const canvas = document.getElementById('snow-canvas');
